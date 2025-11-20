@@ -24,6 +24,7 @@ MA 02110-1301, USA.
 #include <filesystem>
 #include <vector>
 #include <fstream>
+#include <stdexcept>
 
 void fillFile(const std::string &str, std::size_t size);
 
@@ -33,14 +34,16 @@ int main(int argc, char *argv[]) {
 }
 
 void fillFile(const std::string &str, std::size_t size) {
-  std::ofstream file(str, std::ios::binary | std::ios::trunc);
-  if (!file) { std::cerr << "Error: Unable to open file." << std::endl; return; }
-  static const std::size_t bufferSize = 4096; // 4 KB buffer
-  std::vector<char> buffer(bufferSize, 0);
-  while (size > 0) {
-    std::size_t chunkSize = (size < bufferSize) ? size : bufferSize;
-    file.write(buffer.data(), chunkSize);
-    size -= chunkSize;
-  }
-  file.close();
+  try {
+    std::ofstream file(str, std::ios::binary | std::ios::trunc);
+    if (!file) { std::cerr << "Error: Unable to open file." << std::endl; return; }
+    static const std::size_t bufferSize = 4096; // 4 KB buffer
+    std::vector<char> buffer(bufferSize, 0);
+    while (size > 0) {
+      std::size_t chunkSize = (size < bufferSize) ? size : bufferSize;
+      file.write(buffer.data(), chunkSize);
+      size -= chunkSize;
+    }
+    file.close();
+  } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
 }
