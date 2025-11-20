@@ -25,17 +25,22 @@ MA 02110-1301, USA.
 #include <fstream>
 #include <stdexcept>
 
-void fillFile(const std::string &str, std::size_t size);
+void shredFile(const std::string &str, std::size_t size);
+
+namespace fs = std::filesystem;
 
 int main(int argc, char *argv[]) {
-  for (unsigned int x = 1; x <= static_cast<unsigned int>(argc) - 1; x++) { fillFile(argv[x], std::filesystem::file_size(argv[x])); }
+  unsigned int x = 1;
+  unsigned int z = static_cast<unsigned int>(argc) - 1;
+  for (; x <= z; x++) { if (!fs::exists(argv[x])) { std::cerr << argv[x] << " doesn't exists. Nothing to be done." << std::endl; return EXIT_FAILURE; }
+    shredFile(argv[x], fs::file_size(argv[x])); }
   return EXIT_SUCCESS;
 }
 
-void fillFile(const std::string &str, std::size_t size) {
+void shredFile(const std::string &str, std::size_t size) {
   try {
     std::ofstream file(str, std::ios::binary | std::ios::trunc);
-    if (!file) { std::cerr << "Error: Unable to open file." << std::endl; return; }
+    if (!file) { std::cerr << "Error: Unable to open file for writing." << std::endl; return; }
     static const std::size_t bufferSize = 4096; // 4 KB buffer
     std::vector<char> buffer(bufferSize, 0);
     while (size > 0) {
