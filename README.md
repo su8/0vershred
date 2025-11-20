@@ -1,6 +1,24 @@
 # 0vershred  [![C/C++ CI](https://github.com/su8/0vershred/actions/workflows/c-cpp.yml/badge.svg?branch=main)](https://github.com/su8/0vershred/actions/workflows/c-cpp.yml)  [![flawfinder](https://github.com/su8/0vershred/actions/workflows/flawfinder.yml/badge.svg?branch=main)](https://github.com/su8/0vershred/actions/workflows/flawfinder.yml)
 The 0vershred command is used to securely delete files by overwriting their contents multiple times, making it difficult for even advanced recovery tools to retrieve the original data. This command is particularly useful for erasing sensitive information. (copied from the `shred` man page, all credits to this information belong to `shred`).
 
+`0vershred` is faster than `shred` when shredding 1GB testing file:
+
+```bash
+truncate -s 1G test.bin
+time shred --iterations=2 test.bin
+######
+real 1m53.908s
+user 0m0.986s
+sys 0m15.761s
+
+truncate -s 1G test2.bin
+time 0vershred test2.bin
+#####
+real 0m13.371s
+user 0m0.437s
+sys 0m12.761s
+```
+
 ---
 
 If on **Linux/\*BSD/Mac** compile with:
