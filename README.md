@@ -97,3 +97,9 @@ To overwrite some files with the `0vershred.bat` script, copy the name of the de
 ### To compile the main.cpp press **CTRL** + **SHIFT** + **B** , then from the same Desktop folder start the `0vershred.bat` script. Now you can delete the "main.exe" file
 
 Optioanlly if you want to play around with the code from VSCode's console -- wait until it compiles, after that press **CTRL** + **SHIFT** + **\`** and paste this `cp -r C:\Users\YOUR_USERNAME_GOES_HERE\Desktop\main.exe C:\MingW\bin;cd C:\MingW\bin;.\main.exe C:\`
+
+---
+
+### To-do
+
+Detect the filesystem file name block size when compiling/running `0vershred`. Currently it's portable to presume it's 4K, but there are 8K and 16K with newer SSD's.
