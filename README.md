@@ -102,4 +102,4 @@ Optioanlly if you want to play around with the code from VSCode's console -- wai
 
 ### To-do
 
-Detect the filesystem file name block size when compiling/running `0vershred`. Currently it's portable to presume it's 4K, but there are 8K and 16K with newer SSD's.
+Detect the filesystem block size when compiling/running `0vershred`. Currently it's portable to presume it's 4K, but there are 8K and 16K with newer SSD's.
