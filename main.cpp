@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 static inline void shredFile(const std::string &str, std::size_t size) {
   try {
     std::ofstream file(str, std::ios::binary | std::ios::trunc);
-    if (!file) { std::cerr << "Error: Unable to open file for writing." << std::endl; return; }
+    if (!file) { std::cerr << "Error: Unable to open " << str << " file for writing. Exiting." << std::endl; return; }
     static const std::size_t bufferSize = blockSize();
     static const std::vector<char> buffer(bufferSize, 0);
     while (size > 0) {
