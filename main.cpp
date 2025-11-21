@@ -42,7 +42,7 @@ static inline void shredFile(const std::string &str, std::size_t size) {
     std::ofstream file(str, std::ios::binary | std::ios::trunc);
     if (!file) { std::cerr << "Error: Unable to open file for writing." << std::endl; return; }
     static const std::size_t bufferSize = 4096; // 4 KB filesystem block size buffer
-    std::vector<char> buffer(bufferSize, 0);
+    static const std::vector<char> buffer(bufferSize, 0);
     while (size > 0) {
       std::size_t chunkSize = (size < bufferSize) ? size : bufferSize;
       file.write(buffer.data(), chunkSize);
