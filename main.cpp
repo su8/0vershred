@@ -25,7 +25,7 @@ MA 02110-1301, USA.
 #include <fstream>
 #include <stdexcept>
 
-void shredFile(const std::string &str, std::size_t size);
+static inline void shredFile(const std::string &str, std::size_t size);
 
 namespace fs = std::filesystem;
 
@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
-void shredFile(const std::string &str, std::size_t size) {
+static inline void shredFile(const std::string &str, std::size_t size) {
   try {
     std::ofstream file(str, std::ios::binary | std::ios::trunc);
     if (!file) { std::cerr << "Error: Unable to open file for writing." << std::endl; return; }
-    static const std::size_t bufferSize = 4096; // 4 KB buffer
+    static const std::size_t bufferSize = 4096; // 4 KB filesystem block size buffer
     std::vector<char> buffer(bufferSize, 0);
     while (size > 0) {
       std::size_t chunkSize = (size < bufferSize) ? size : bufferSize;
