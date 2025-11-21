@@ -25,7 +25,16 @@ MA 02110-1301, USA.
 #include <fstream>
 #include <stdexcept>
 
+#if defined(_WIN32)
+#include <windows.h>
+#else
+#include <sys/statvfs.h>
+#include <errno.h>
+#include <cstring>
+#endif /* _WIN23 */
+
 static inline void shredFile(const std::string &str, std::size_t size);
+static inline unsigned long int blockSize(void);
 
 namespace fs = std::filesystem;
 
@@ -41,7 +50,7 @@ static inline void shredFile(const std::string &str, std::size_t size) {
   try {
     std::ofstream file(str, std::ios::binary | std::ios::trunc);
     if (!file) { std::cerr << "Error: Unable to open file for writing." << std::endl; return; }
-    static const std::size_t bufferSize = 4096; // 4 KB filesystem block size buffer
+    static const std::size_t bufferSize = blockSize(); // 4 KB filesystem block size buffer
     static const std::vector<char> buffer(bufferSize, 0);
     while (size > 0) {
       std::size_t chunkSize = (size < bufferSize) ? size : bufferSize;
@@ -50,4 +59,21 @@ static inline void shredFile(const std::string &str, std::size_t size) {
     }
     file.close();
   } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
+}
+
+static inline unsigned long int blockSize(void) {
+#if defined(_WIN32)
+  DWORD sectorsPerCluster;
+  DWORD bytesPerSector;
+  DWORD numberOfFreeClusters;
+  DWORD totalNumberOfClusters;
+  std::wstring wpath = L"C:\\";
+  if (!GetDiskFreeSpaceW(wpath.c_str(), &sectorsPerCluster, &bytesPerSector, &numberOfFreeClusters, &totalNumberOfClusters)) { throw std::runtime_error("GetDiskFreeSpaceW failed with error code: " + std::to_string(GetLastError())); }
+  return static_cast<unsigned long int>(sectorsPerCluster * bytesPerSector);
+#else
+  struct statvfs fsinfo;
+  const std::string path = "/"; 
+  if (statvfs(path.c_str(), &fsinfo) != 0) { throw std::runtime_error("statvfs failed: " + std::string(std::strerror(errno))); }
+  return static_cast<unsigned long int>(fsinfo.f_bsize);
+#endif /* _WIN32 */
 }
