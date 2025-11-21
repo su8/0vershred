@@ -21,6 +21,12 @@ sys 0m12.761s
 
 ---
 
+## Program options
+
+`-i` `NUM` of iterations to perform, by default they are 1.
+
+---
+
 If on **Linux/\*BSD/Mac** compile with:
 
 ```bash
