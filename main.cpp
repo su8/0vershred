@@ -75,8 +75,7 @@ static inline unsigned long int blockSize(void) {
   return static_cast<unsigned long int>(sectorsPerCluster * bytesPerSector);
 #else
   struct statvfs fsinfo;
-  const std::string path = "/"; 
-  if (statvfs(path.c_str(), &fsinfo) != 0) { throw std::runtime_error("statvfs failed: " + std::string(std::strerror(errno))); }
+  if (statvfs("/", &fsinfo) != 0) { throw std::runtime_error("statvfs failed: " + std::string(std::strerror(errno))); }
   return static_cast<unsigned long int>(fsinfo.f_bsize);
 #endif /* _WIN32 */
 }
