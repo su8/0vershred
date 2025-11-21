@@ -12,7 +12,7 @@ user 0m0.986s
 sys 0m15.761s
 
 truncate -s 1G test2.bin
-time 0vershred test2.bin
+time 0vershred -i 2 test2.bin
 #####
 real 0m13.371s
 user 0m0.437s
