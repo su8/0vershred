@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   std::vector<std::thread> threads;
   for (; x <= z; x++) { if (!fs::exists(argv[x])) { std::cerr << argv[x] << " doesn't exists. Nothing to be done." << std::endl; return EXIT_FAILURE; }
     if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { threads.emplace_back(shredFile, argv[x] + std::to_string(y), argv[x], fs::file_size(argv[x])); } for (auto &th : threads) { if (th.joinable()) { th.join(); } } }
-    else { shredFile(argv[x], argv[x], fs::file_size(argv[x])); } }
+    else { shredFile(argv[x] + std::to_string(1), argv[x], fs::file_size(argv[x])); } }
   return EXIT_SUCCESS;
 }
 
