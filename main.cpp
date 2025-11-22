@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   unsigned int y = 0U;
   unsigned int w = (argc == 2) ? 0U : std::strtoul(argv[2], static_cast<char **>(nullptr), 10);
   for (; x <= z; x++) { if (!fs::exists(argv[x])) { std::cerr << argv[x] << " doesn't exists. Nothing to be done." << std::endl; return EXIT_FAILURE; }
-    if (argc > 2 && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { shredFile(argv[x], fs::file_size(argv[x])); } }
+    if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { shredFile(argv[x], fs::file_size(argv[x])); } }
     else { shredFile(argv[x], fs::file_size(argv[x])); } }
   return EXIT_SUCCESS;
 }
