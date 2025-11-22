@@ -60,6 +60,7 @@ static inline void shredFile(const std::string &str, std::size_t size) {
       file.write(buffer.data(), chunkSize);
       size -= chunkSize;
     }
+    file.flush();
     file.close();
   } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
 }
