@@ -24,6 +24,8 @@ MA 02110-1301, USA.
 #include <vector>
 #include <fstream>
 #include <stdexcept>
+#include <thread>
+#include <mutex>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -33,24 +35,27 @@ MA 02110-1301, USA.
 #include <cstring>
 #endif /* _WIN23 */
 
-static inline void shredFile(const std::string &str, std::size_t size);
+static void shredFile(const std::string &str, std::size_t size);
 static inline unsigned long int blockSize(void);
 
 namespace fs = std::filesystem;
+std::mutex mtx;
 
 int main(int argc, char *argv[]) {
   unsigned int x = (argc == 2) ? 1U : 3U;
   unsigned int z = static_cast<unsigned int>(argc) - 1;
   unsigned int y = 0U;
   unsigned int w = (argc == 2) ? 0U : std::strtoul(argv[2], static_cast<char **>(nullptr), 10);
+  std::vector<std::thread> threads;
   for (; x <= z; x++) { if (!fs::exists(argv[x])) { std::cerr << argv[x] << " doesn't exists. Nothing to be done." << std::endl; return EXIT_FAILURE; }
-    if (argc > 2 && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { shredFile(argv[x], fs::file_size(argv[x])); } }
+    if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { threads.emplace_back(shredFile, argv[x], fs::file_size(argv[x])); } for (auto &th : threads) { if (th.joinable()) { th.join(); } } }
     else { shredFile(argv[x], fs::file_size(argv[x])); } }
   return EXIT_SUCCESS;
 }
 
-static inline void shredFile(const std::string &str, std::size_t size) {
+static void shredFile(const std::string &str, std::size_t size) {
   try {
+    std::lock_guard<std::mutex> lock(mtx);
     std::ofstream file(str, std::ios::binary | std::ios::trunc);
     if (!file) { std::cerr << "Error: Unable to open " << str << " file for writing. Exiting." << std::endl; return; }
     static const std::size_t bufferSize = blockSize();
@@ -62,7 +67,7 @@ static inline void shredFile(const std::string &str, std::size_t size) {
     }
     file.flush();
     file.close();
-  } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
+  } catch (const std::exception &e) { std::lock_guard<std::mutex> lock(mtx); std::cerr << "Error: " << e.what() << std::endl; return; }
 }
 
 static inline unsigned long int blockSize(void) {
