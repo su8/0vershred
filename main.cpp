@@ -17,6 +17,7 @@ MA 02110-1301, USA.
 */
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -28,16 +29,9 @@ MA 02110-1301, USA.
 #include <random>
 #include <chrono>
 
-#if defined(_WIN32)
-#include <windows.h>
-#include <io.h>
-#define unlink _unlink
-#else
-#include <sys/statvfs.h>
-#include <cerrno>
-#include <cstring>
+#if !defined(_WIN32)
 #include <unistd.h>
-#endif /* _WIN23 */
+#endif /* !_WIN23 */
 
 static inline void shredFile(const std::string &str, std::size_t size);
 static inline std::string obfuscateFilename(void);
