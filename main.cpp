@@ -24,16 +24,22 @@ MA 02110-1301, USA.
 #include <vector>
 #include <fstream>
 #include <stdexcept>
+#include <algorithm>
+#include <random>
 
 #if defined(_WIN32)
 #include <windows.h>
+#include <io.h>
+#define unlink _unlink
 #else
 #include <sys/statvfs.h>
-#include <errno.h>
+#include <cerrno>
 #include <cstring>
+#include <unistd.h>
 #endif /* _WIN23 */
 
 static inline void shredFile(const std::string &str, std::size_t size);
+static inline std::string obfuscateFilename(void);
 static inline unsigned long int blockSize(void);
 
 namespace fs = std::filesystem;
@@ -43,8 +49,12 @@ int main(int argc, char *argv[]) {
   unsigned int z = static_cast<unsigned int>(argc) - 1;
   unsigned int y = 0U;
   unsigned int w = (argc == 2) ? 0U : std::strtoul(argv[2], static_cast<char **>(nullptr), 10);
+  unsigned int firstRun = 0U;
   for (; x <= z; x++) { if (!fs::exists(argv[x])) { std::cerr << argv[x] << " doesn't exists. Nothing to be done." << std::endl; return EXIT_FAILURE; }
     if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { shredFile(argv[x], fs::file_size(argv[x])); } }
+    else if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'r') { unsigned int upTo = std::strtoul(argv[2], static_cast<char **>(nullptr), 10);
+      for (unsigned int q = 0; q < upTo; q++) {
+        std::string oldOne = obfuscateFilename(); std::string newOne = obfuscateFilename(); std::rename(firstRun == 0U ? argv[x] : oldOne.data(), newOne.data()); firstRun = 1U; } }
     else { shredFile(argv[x], fs::file_size(argv[x])); } }
   return EXIT_SUCCESS;
 }
@@ -63,6 +73,16 @@ static inline void shredFile(const std::string &str, std::size_t size) {
     file.flush();
     file.close();
   } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
+}
+
+static inline std::string obfuscateFilename(void) {
+  static const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  std::uniform_int_distribution<> distribution(0, chars.size() - 1);
+  std::string randomString;
+  for (unsigned int x = 0U; x < 50U; x++) { randomString += chars[distribution(generator)]; }
+  return randomString;
 }
 
 static inline unsigned long int blockSize(void) {

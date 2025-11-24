@@ -25,6 +25,8 @@ sys 0m12.761s
 
 `-i` `NUM` of iterations to perform, by default they are 1.
 
+`-r` `NUM` of iterations to perfrom to rename the provided filename. Useful not only to shred file, but to obfuscate it's name to make it harder to be found by searching thru the data recovery programs by it's original name, as there won't be any match for deleted file.
+
 ---
 
 If on **Linux/\*BSD/Mac** compile with:
