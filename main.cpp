@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   for (; x <= z; x++) { if (!fs::exists(argv[x])) { std::cerr << argv[x] << " doesn't exists. Nothing to be done." << std::endl; return EXIT_FAILURE; }
     if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { shredFile(argv[x], fs::file_size(argv[x])); } }
     else if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'r') { for (unsigned int q = 0; q < w; q++) { oldOne = firstRun == 0U ? argv[x] : newOne; newOne = obfuscateFilename();
-      std::rename(oldOne.data(), newOne.data()); firstRun = 1U; } shredFile(newOne, fs::file_size(newOne.data())); if (fs::exists(newOne) && fs::is_regular_file(newOne)) { std::remove(newOne.data()); } }
+      std::rename(oldOne.data(), newOne.data()); firstRun = 1U; } shredFile(newOne, fs::file_size(newOne.data())); if (fs::exists(newOne) && fs::is_regular_file(newOne)) { std::remove(newOne.data()); } firstRun = 0U; }
     else { shredFile(argv[x], fs::file_size(argv[x])); } }
   return EXIT_SUCCESS;
 }
