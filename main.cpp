@@ -49,12 +49,15 @@ int main(int argc, char *argv[]) {
   unsigned int z = static_cast<unsigned int>(argc) - 1;
   unsigned int y = 0U;
   unsigned int w = (argc == 2) ? 0U : std::strtoul(argv[2], static_cast<char **>(nullptr), 10);
+  unsigned int removeFile = 0U;
   unsigned int firstRun = 0U;
+  std::string newOne;
+  std::string oldOne;
   for (; x <= z; x++) { if (!fs::exists(argv[x])) { std::cerr << argv[x] << " doesn't exists. Nothing to be done." << std::endl; return EXIT_FAILURE; }
     if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { shredFile(argv[x], fs::file_size(argv[x])); } }
     else if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'r') { unsigned int upTo = std::strtoul(argv[2], static_cast<char **>(nullptr), 10);
-      for (unsigned int q = 0; q < upTo; q++) {
-        std::string oldOne = obfuscateFilename(); std::string newOne = obfuscateFilename(); std::rename(firstRun == 0U ? argv[x] : oldOne.data(), newOne.data()); firstRun = 1U; } }
+      for (unsigned int q = 0; q < upTo; q++) { 
+        oldOne = firstRun == 0U ? argv[x] : newOne; newOne = obfuscateFilename(); std::rename(oldOne.data(), newOne.data()); firstRun = 1U; } unlink(newOne.data()); }
     else { shredFile(argv[x], fs::file_size(argv[x])); } }
   return EXIT_SUCCESS;
 }
