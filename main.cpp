@@ -49,7 +49,6 @@ int main(int argc, char *argv[]) {
   unsigned int z = static_cast<unsigned int>(argc) - 1;
   unsigned int y = 0U;
   unsigned int w = (argc == 2) ? 0U : std::strtoul(argv[2], static_cast<char **>(nullptr), 10);
-  unsigned int removeFile = 0U;
   unsigned int firstRun = 0U;
   std::string newOne;
   std::string oldOne;
