@@ -1,7 +1,7 @@
 # 0vershred  [![C/C++ CI](https://github.com/su8/0vershred/actions/workflows/c-cpp.yml/badge.svg?branch=main)](https://github.com/su8/0vershred/actions/workflows/c-cpp.yml)  [![flawfinder](https://github.com/su8/0vershred/actions/workflows/flawfinder.yml/badge.svg?branch=main)](https://github.com/su8/0vershred/actions/workflows/flawfinder.yml)
 The 0vershred command is used to securely delete files by overwriting their contents multiple times, making it difficult for even advanced recovery tools to retrieve the original data. This command is particularly useful for erasing sensitive information. (copied from the `shred` man page, all credits to this information belong to `shred`).
 
-`0vershred` is faster than `shred` when shredding 1GB testing file:
+`0vershred` is faster than `shred` when shredding big testing files:
 
 ```bash
 truncate -s 1G test.bin
@@ -14,7 +14,7 @@ sys 0m15.761s
 truncate -s 1G test2.bin
 time 0vershred -i 2 test2.bin
 #####
-real 0m13.371s
+real 0m03.371s
 user 0m0.437s
 sys 0m12.761s
 ```
@@ -25,7 +25,7 @@ sys 0m12.761s
 
 `-i` `NUM` of iterations to perform, by default they are 1.
 
-`-r` `NUM` of iterations to perfrom to rename the provided filename. Useful not only to shred file, but to obfuscate it's name to make it harder to be found by searching thru the data recovery programs by it's original name, as there won't be any match for deleted file.
+`-r` `NUM` of iterations to perfrom to rename the provided filename. Useful not only to shred file, but to obfuscate it's name to make it harder to be found by searching thru the data recovery programs by it's original name, as there won't be any match for the particular deleted file.
 
 ---
 

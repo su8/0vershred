@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <stdexcept>
 #include <algorithm>
 #include <random>
+#include <chrono>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -40,7 +41,6 @@ MA 02110-1301, USA.
 
 static inline void shredFile(const std::string &str, std::size_t size);
 static inline std::string obfuscateFilename(void);
-static inline unsigned long int blockSize(void);
 
 namespace fs = std::filesystem;
 
@@ -52,11 +52,15 @@ int main(int argc, char *argv[]) {
   unsigned int firstRun = 0U;
   std::string newOne;
   std::string oldOne;
+  auto start = std::chrono::high_resolution_clock::now();
   for (; x <= z; x++) { if (!fs::exists(argv[x])) { std::cerr << argv[x] << " doesn't exists. Nothing to be done." << std::endl; return EXIT_FAILURE; }
     if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'i') { for (y = 0U; y < w; y++) { shredFile(argv[x], fs::file_size(argv[x])); } }
     else if (argc > 2 && argv[1][0] == '-' && argv[1][1] == 'r') { for (unsigned int q = 0; q < w; q++) { oldOne = firstRun == 0U ? argv[x] : newOne; newOne = obfuscateFilename();
       std::rename(oldOne.data(), newOne.data()); firstRun = 1U; } shredFile(newOne, fs::file_size(newOne.data())); if (fs::exists(newOne) && fs::is_regular_file(newOne)) { std::remove(newOne.data()); } firstRun = 0U; }
     else { shredFile(argv[x], fs::file_size(argv[x])); } }
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "Shredding took " << elapsed.count() << " seconds." << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -64,8 +68,9 @@ static inline void shredFile(const std::string &str, std::size_t size) {
   try {
     std::ofstream file(str, std::ios::binary | std::ios::trunc);
     if (!file) { std::cerr << "Error: Unable to open " << str << " file for writing. Exiting." << std::endl; return; }
-    static const std::size_t bufferSize = blockSize();
+    static const std::size_t bufferSize = 8U * 1024U * 1024U;
     static const std::vector<char> buffer(bufferSize, 0);
+    file.rdbuf()->pubsetbuf(nullptr, 0); // Let the OS handle buffering
     while (size > 0) {
       std::size_t chunkSize = (size < bufferSize) ? size : bufferSize;
       file.write(buffer.data(), chunkSize);
@@ -84,20 +89,4 @@ static inline std::string obfuscateFilename(void) {
   std::string randomString;
   for (unsigned int x = 0U; x < 50U; x++) { randomString += chars[distribution(generator)]; }
   return randomString;
-}
-
-static inline unsigned long int blockSize(void) {
-#if defined(_WIN32)
-  DWORD sectorsPerCluster;
-  DWORD bytesPerSector;
-  DWORD numberOfFreeClusters;
-  DWORD totalNumberOfClusters;
-  std::wstring wpath = L"C:\\";
-  if (!GetDiskFreeSpaceW(wpath.c_str(), &sectorsPerCluster, &bytesPerSector, &numberOfFreeClusters, &totalNumberOfClusters)) { throw std::runtime_error("GetDiskFreeSpaceW failed with error code: " + std::to_string(GetLastError())); }
-  return static_cast<unsigned long int>(sectorsPerCluster * bytesPerSector);
-#else
-  struct statvfs fsinfo;
-  if (statvfs("/", &fsinfo) != 0) { throw std::runtime_error("statvfs failed: " + std::string(std::strerror(errno))); }
-  return static_cast<unsigned long int>(fsinfo.f_bsize);
-#endif /* _WIN32 */
 }
