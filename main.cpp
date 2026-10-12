@@ -63,7 +63,9 @@ static inline void shredFile(const std::string &str, std::size_t size) {
     std::ofstream file(str, std::ios::binary | std::ios::trunc);
     if (!file) { std::cerr << "Error: Unable to open " << str << " file for writing. Exiting." << std::endl; return; }
     static const std::size_t bufferSize = 8U * 1024U * 1024U;
-    static const std::vector<char> buffer(bufferSize, 0);
+    std::vector<char> buffer(bufferSize);
+    std::mt19937_64 gen(std::random_device{}());
+    for (auto &bf : buffer) { bf = static_cast<char>(gen() & 0xFF); }
     file.rdbuf()->pubsetbuf(nullptr, 0); // Let the OS handle buffering
     while (size > 0) {
       std::size_t chunkSize = (size < bufferSize) ? size : bufferSize;
@@ -79,7 +81,7 @@ static inline std::string obfuscateFilename(void) {
   static const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   std::random_device rd;
   std::mt19937 generator(rd());
-  std::uniform_int_distribution<> distribution(0, 62);
+  std::uniform_int_distribution<> distribution(0, 61);
   std::string randomString;
   for (unsigned int x = 0U; x < 50U; x++) { randomString += chars[distribution(generator)]; }
   return randomString;
